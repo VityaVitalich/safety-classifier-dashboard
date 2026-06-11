@@ -16,8 +16,11 @@ a.card p{margin:0;color:var(--mut);font-size:13px}
 <h1>Multilingual Safety Classifier</h1>
 <p class="sub">SafeLM-style 0–5 safety scorer over multilingual web text (mmBERT, frozen encoder + head).</p>
 
-<a class="card" href="corpus.html"><h2>Corpus Safety Report Card &#8594;</h2>
-<p>Per-language safety-score distribution over the full scored FineWeb-2 corpus (~5.0B documents, 1,913 languages). Adjustable severity threshold; flagged % and counts.</p></a>
+<a class="card" href="corpus.html"><h2>FineWeb-2 — Corpus Report Card &#8594;</h2>
+<p>Per-language safety-score distribution over the full scored FineWeb-2 corpus (~5.0B documents, 1,913 languages). Adjustable severity threshold; flagged % and counts. Out-of-training languages are over-flagged (model is OOD).</p></a>
+
+<a class="card" href="corpus_dclm.html"><h2>DCLM-Edu — Corpus Report Card &#8594;</h2>
+<p>Safety-score distribution over the scored DCLM-Edu corpus (~1.24B English documents). English is in-distribution, so labels are reliable. Adjustable severity threshold; flagged % and counts.</p></a>
 
 <a class="card" href="results.html"><h2>Head Results &#8594;</h2>
 <p>Per-class / per-language metrics, confusion matrices, PR curves and binary operating points across all trained heads, on the labeled evaluation set.</p></a>
