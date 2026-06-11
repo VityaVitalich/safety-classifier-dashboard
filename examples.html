@@ -52,5 +52,11 @@ function render(){
     || `<div class="note">No examples for this selection.</div>`;
 }
 $("ds").onchange=fillLangs; $("lg").onchange=fillClasses; $("cl").onchange=render;
-fillDatasets();
+function applyParams(){            // deep-link from the corpus pages: ?ds=&lang=&cl=
+  const p=new URLSearchParams(location.search);
+  const ds=p.get("ds"); if(ds&&D[ds]){ $("ds").value=ds; fillLangs(); }
+  const lg=p.get("lang"); if(lg&&D[$("ds").value][lg]){ $("lg").value=lg; fillClasses(); }
+  const cl=p.get("cl"); if(cl!=null&&D[$("ds").value][$("lg").value][cl]){ $("cl").value=cl; render(); }
+}
+fillDatasets(); applyParams();
 </script></body></html>
