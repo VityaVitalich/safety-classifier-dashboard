@@ -30,11 +30,16 @@ tr:hover td{background:#141821}
 .lname{color:var(--mut);margin-left:8px}
 .hot{color:#ff8585}
 td.dist{text-align:left}
+.corpnav{margin:2px 0 8px;font-size:12px;color:var(--mut)}
+.corpnav a{color:var(--accent);text-decoration:none;margin-right:12px}
+.corpnav a.active{color:#e6e9ef;font-weight:700;text-decoration:underline;cursor:default}
+.corpnav .lbl{margin-right:6px}
 </style></head><body>
 <header>
   <h1>Corpus Safety Report Card <span class="note" id="sub"></span>
     <a id="exlink" style="font-size:13px;margin-left:14px;color:var(--accent);text-decoration:none">examples &#8599;</a>
     <a href="results.html" style="font-size:13px;margin-left:14px;color:var(--accent);text-decoration:none">&#8592; head results</a></h1>
+  <div class="corpnav"><span class="lbl">corpora:</span><a class="active">FineWeb-2</a><a href="corpus_dclm.html">DCLM-Edu</a><a href="corpus_fwedu2.html">FineWeb-Edu-Score-2</a></div>
   <div class="bar">
     <span><label>flag predicted score ≥</label>
       <select id="thr"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></span>
