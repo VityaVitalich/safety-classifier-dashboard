@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>FineWeb-Edu-Score-2 — Sensitive Classifier</title>
+<style>
+:root{--bg:#0f1115;--card:#171a21;--mut:#8b94a3;--line:#262b36;--accent:#5b8cff;--sens:#e8923a}
+*{box-sizing:border-box}
+body{margin:0;font:14.5px/1.6 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:#e6e9ef}
+.wrap{max-width:880px;margin:0 auto;padding:28px 22px}
+h1{font-size:20px;margin:0 0 4px}h1 a{font-size:13px;margin-left:12px;color:var(--accent);text-decoration:none}
+.sub{color:var(--mut);margin:0 0 18px}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:20px;background:var(--sens);color:#0b0d10}
+.kpis{display:flex;gap:26px;flex-wrap:wrap;margin:14px 0 6px}
+.kpi b{font-size:22px;color:#cfe}.kpi span{color:var(--mut);font-size:12px;display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-top:14px}
+h2{font-size:14px;margin:0 0 10px;color:#cdd6e4}
+.row{display:flex;gap:16px;align-items:center;margin:10px 0;flex-wrap:wrap}
+label{color:var(--mut);margin-right:6px}
+input[type=range]{width:340px;accent-color:var(--sens);vertical-align:middle}
+.big{font-size:30px;font-weight:700;color:#cfe}.big small{font-size:14px;color:var(--mut);font-weight:400}
+.kv{display:flex;gap:30px;flex-wrap:wrap;margin-top:12px}.kv div b{font-size:19px;color:#e6e9ef}
+.bar{height:14px;background:#0f1115;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-top:12px}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,#e8c23a,#e8643a)}
+svg{display:block;width:100%;height:170px}
+.note{font-size:12px;color:var(--mut);margin-top:12px}.warn{color:#ffcf6b}
+code{background:#0f1115;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+</style></head><body><div class="wrap">
+<h1>FineWeb-Edu-Score-2 — Sensitive Classifier <a href="index.html">&#8592; dashboards</a>
+  <a href="definitions.html">what is "sensitive"? &#8599;</a></h1>
+<p class="sub"><span class="pill">SENSITIVE</span> A dedicated detector for documents that <i>touch</i>
+a sensitive topic (even neutrally/historically/in fiction) — <b>separate from</b> the 0&ndash;5 harm
+scorer. Score = P(sensitive) from a binary mmBERT head.</p>
+
+<div class="kpis">
+  <div class="kpi"><b id="prev"></b><span>sensitive prevalence (est.)</span></div>
+  <div class="kpi"><b id="auprc"></b><span>AUPRC @ corpus prevalence</span></div>
+  <div class="kpi"><b id="nsamp"></b><span>representative docs scored</span></div>
+</div>
+
+<div class="card">
+  <h2>Score distribution — P(sensitive) over the corpus (sampled)</h2>
+  <svg id="hist" viewBox="0 0 600 170" preserveAspectRatio="none"></svg>
+  <div class="note">Histogram of the head's P(sensitive) across the representative sample.</div>
+</div>
+
+<div class="card">
+  <h2>Threshold explorer — flag if P(sensitive) &ge; &tau;</h2>
+  <div class="row"><label>&tau;</label><input id="tau" type="range" min="0" max="1" step="0.02" value="0.73">
+    <span id="tauval" style="font-variant-numeric:tabular-nums"></span></div>
+  <div class="big" id="flag"></div>
+  <div class="bar"><span id="barfill"></span></div>
+  <div class="kv">
+    <div>est. precision<br><b id="prec"></b></div>
+    <div>est. recall<br><b id="rec"></b></div>
+    <div>flagged docs (of sample)<br><b id="cnt"></b></div>
+  </div>
+  <div class="note" id="rule"></div>
+  <div class="note warn" id="note"></div>
+</div>
+<p class="note">Precision/recall are estimated against Llama-judged sensitive labels on the sample
+(true prevalence shown above). This is a <b>sampled estimate</b> — full-corpus scoring was not run.</p>
+</div>
+<script>
+const D={"label": "FineWeb-Edu-Score-2", "classifier": "sensitive-topic", "n_sampled": 12986, "prevalence": 0.1305, "auprc": 0.7657, "grid": [0.0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14, 0.16, 0.18, 0.2, 0.22, 0.24, 0.26, 0.28, 0.3, 0.32, 0.34, 0.36, 0.38, 0.4, 0.42, 0.44, 0.46, 0.48, 0.5, 0.52, 0.54, 0.56, 0.58, 0.6, 0.62, 0.64, 0.66, 0.68, 0.7, 0.72, 0.74, 0.76, 0.78, 0.8, 0.82, 0.84, 0.86, 0.88, 0.9, 0.92, 0.94, 0.96, 0.98, 1.0], "survival": [1.0, 0.48583, 0.40497, 0.36331, 0.33567, 0.31041, 0.29124, 0.27522, 0.2602, 0.24988, 0.24034, 0.23156, 0.22232, 0.21515, 0.20699, 0.20029, 0.19329, 0.18712, 0.18166, 0.17573, 0.1708, 0.16472, 0.15933, 0.15501, 0.15109, 0.146, 0.14192, 0.13661, 0.13183, 0.12829, 0.12537, 0.12098, 0.11697, 0.11366, 0.10981, 0.10542, 0.10111, 0.09687, 0.09218, 0.08902, 0.08424, 0.07893, 0.074, 0.06938, 0.06345, 0.05799, 0.05175, 0.04366, 0.03535, 0.02403, 0.0], "precision": [0.1305, 0.2618, 0.3082, 0.3387, 0.3634, 0.3885, 0.4088, 0.4287, 0.4513, 0.4647, 0.4806, 0.4938, 0.5095, 0.5197, 0.5342, 0.5459, 0.5578, 0.57, 0.5778, 0.5903, 0.5983, 0.6073, 0.6172, 0.6274, 0.633, 0.6429, 0.6517, 0.6646, 0.6787, 0.6885, 0.6972, 0.7123, 0.7248, 0.7276, 0.737, 0.7436, 0.7578, 0.7687, 0.7845, 0.7941, 0.8154, 0.8312, 0.846, 0.8602, 0.8726, 0.8911, 0.9048, 0.9224, 0.9564, 0.9712, null], "recall": [1.0, 0.9746, 0.9563, 0.9428, 0.9345, 0.9239, 0.9121, 0.9038, 0.8997, 0.8897, 0.885, 0.8761, 0.8678, 0.8566, 0.8472, 0.8378, 0.826, 0.8171, 0.8041, 0.7947, 0.7829, 0.7664, 0.7534, 0.7451, 0.7327, 0.7192, 0.7086, 0.6956, 0.6855, 0.6767, 0.6696, 0.6602, 0.6496, 0.6336, 0.6201, 0.6006, 0.587, 0.5705, 0.554, 0.5416, 0.5263, 0.5027, 0.4796, 0.4572, 0.4242, 0.3959, 0.3587, 0.3086, 0.259, 0.1788, 0.0], "hist": [8010, 945, 558, 352, 283, 237, 205, 178, 177, 145, 155, 113, 132, 127, 139, 136, 162, 179, 238, 515], "hist_edges": [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0], "note": "Estimated from a 13k representative cross-dump sample (full-corpus scoring not run). Survival = fraction of corpus with P(sensitive)>=tau; precision/recall from Llama-judged labels at the true 13.1% prevalence."};
+const $=id=>document.getElementById(id);
+const G=D.grid;
+function interp(arr,tau){ // arr aligned to grid; skip nulls
+  let i=0; while(i<G.length-1 && G[i+1]<=tau) i++;
+  let a=arr[i], b=arr[Math.min(i+1,G.length-1)];
+  if(a==null) return b; if(b==null) return a;
+  const f=(G[i+1]===G[i])?0:(tau-G[i])/(G[i+1]-G[i]); return a+f*(b-a);
+}
+function drawHist(){
+  const h=D.hist, n=Math.max(...h), W=600,H=170,bw=W/h.length, pad=24;
+  let s="";
+  h.forEach((c,i)=>{const bh=(H-pad)*(c/n); s+=`<rect x="${i*bw+1}" y="${H-pad-bh}" width="${bw-2}" height="${bh}" fill="#e8923a" opacity="0.85"/>`;});
+  // x axis labels 0,0.5,1
+  s+=`<text x="2" y="${H-6}" fill="#8b94a3" font-size="11">P=0</text>`;
+  s+=`<text x="${W/2-14}" y="${H-6}" fill="#8b94a3" font-size="11">0.5</text>`;
+  s+=`<text x="${W-26}" y="${H-6}" fill="#8b94a3" font-size="11">1.0</text>`;
+  $("hist").innerHTML=s;
+}
+function render(){
+  const tau=+$("tau").value; $("tauval").textContent=tau.toFixed(2);
+  const frac=interp(D.survival,tau), prec=interp(D.precision,tau), rec=interp(D.recall,tau);
+  $("flag").innerHTML=(100*frac).toFixed(1)+"% <small>of the corpus flagged sensitive</small>";
+  $("barfill").style.width=Math.min(100,100*frac*3).toFixed(1)+"%";
+  $("prec").textContent=prec==null?"—":"~"+Math.round(100*prec)+"%";
+  $("rec").textContent=rec==null?"—":"~"+Math.round(100*rec)+"%";
+  $("cnt").textContent=Math.round(frac*D.n_sampled).toLocaleString()+" / "+D.n_sampled.toLocaleString();
+  $("rule").innerHTML=`Rule: flag if <code>P(sensitive) &ge; ${tau.toFixed(2)}</code>.`;
+}
+$("prev").textContent=(100*D.prevalence).toFixed(1)+"%";
+$("auprc").textContent=D.auprc.toFixed(3);
+$("nsamp").textContent=D.n_sampled.toLocaleString();
+$("note").textContent=D.note;
+$("tau").addEventListener("input",render);
+drawHist(); render();
+</script></body></html>

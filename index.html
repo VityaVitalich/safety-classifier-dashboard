@@ -28,8 +28,11 @@ and how they differ, plus each classifier's validated performance.</p></a>
 <a class="card" href="corpus_dclm.html"><h2>DCLM-Edu — Corpus Report Card &#8594;</h2>
 <p>Safety-score distribution over the scored DCLM-Edu corpus (~1.24B English documents). English is in-distribution, so labels are reliable. Adjustable severity threshold; flagged % and counts.</p></a>
 
-<a class="card" href="corpus_fwedu2.html"><h2>FineWeb-Edu-Score-2 — Corpus Report Card &#8594;</h2>
-<p>Safety-score distribution over the scored FineWeb-Edu-Score-2 corpus (English, education-filtered web text). <b>Distinct from FineWeb-2.</b> A sensitive-topic detector; per-dataset validated precision lives in the Threshold Explorer. Preliminary.</p></a>
+<a class="card" href="corpus_fwedu2.html"><h2>FineWeb-Edu-Score-2 — Corpus Report Card (0–5 harm) &#8594;</h2>
+<p>0&ndash;5 <b>harm</b>-score distribution over the scored FineWeb-Edu-Score-2 corpus (English, education-filtered web text). <b>Distinct from FineWeb-2.</b> Per-dataset validated precision lives in the Threshold Explorer.</p></a>
+
+<a class="card" href="sensitive.html"><h2>FineWeb-Edu-Score-2 — Sensitive Classifier (separate) &#8594;</h2>
+<p>A <b>separate</b> sensitive-topic detector (binary P(sensitive), not the 0&ndash;5 harm score): its own score distribution and threshold explorer. ~13% of the corpus is sensitive-topic; flag at τ≈0.73 → ~10% flagged at ~77% precision. Sampled estimate.</p></a>
 
 <a class="card" href="threshold.html"><h2>Threshold Explorer &#8594;</h2>
 <p>Turn the 6-class probabilities into a binary unsafe filter: pick the score (p5 / P&ge;4) and drag &tau; to see flagged %/count, with validated sensitive-topic precision.</p></a>
