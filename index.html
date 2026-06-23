@@ -14,7 +14,13 @@ a.card p{margin:0;color:var(--mut);font-size:13px}
 .note{color:var(--mut);font-size:12px;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
 </style></head><body><div class="wrap">
 <h1>Multilingual Safety Classifier</h1>
-<p class="sub">SafeLM-style 0–5 safety scorer over multilingual web text (mmBERT, frozen encoder + head).</p>
+<p class="sub">Two classifiers over web text (mmBERT, frozen encoder + light head): a <b>HARMFUL</b> scorer (SafeLM 0–5)
+and a <b>SENSITIVE-topic</b> detector. Different questions, different labels — start with the definitions.</p>
+
+<a class="card" href="definitions.html"><h2>📖 Harmful vs Sensitive — Definitions &#8594;</h2>
+<p>What we count as <b>harmful</b> (genuinely unsafe content) vs <b>sensitive</b> (merely touches a sensitive
+subject — war history, a death-penalty ruling, fiction). Includes the <b>exact LLM judge prompts</b> for each
+and how they differ, plus each classifier's validated performance.</p></a>
 
 <a class="card" href="corpus.html"><h2>FineWeb-2 — Corpus Report Card &#8594;</h2>
 <p>Per-language safety-score distribution over the full scored FineWeb-2 corpus (~5.0B documents, 1,913 languages). Adjustable severity threshold; flagged % and counts. Out-of-training languages are over-flagged (model is OOD).</p></a>

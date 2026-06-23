@@ -1,0 +1,100 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Harmful vs Sensitive — Definitions</title>
+<style>
+:root{--bg:#0f1115;--card:#171a21;--mut:#8b94a3;--line:#262b36;--accent:#5b8cff;--harm:#d6342c;--sens:#e8923a}
+*{box-sizing:border-box}
+body{margin:0;font:14.5px/1.6 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:#e6e9ef}
+.wrap{max-width:1080px;margin:0 auto;padding:30px 22px}
+h1{font-size:21px;margin:0 0 4px}h1 a{font-size:13px;margin-left:12px;color:var(--accent);text-decoration:none}
+.sub{color:var(--mut);margin:0 0 22px}
+.tldr{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:14px 18px;margin-bottom:24px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){.cols{grid-template-columns:1fr}}
+.col{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 0 16px;overflow:hidden}
+.col h2{margin:0;padding:14px 18px;font-size:16px;color:#0b0d10}
+.col.harm h2{background:var(--harm)}.col.sens h2{background:var(--sens)}
+.col .body{padding:14px 18px}
+.col h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin:16px 0 6px}
+.col h3:first-child{margin-top:0}
+pre{white-space:pre-wrap;word-wrap:break-word;background:#0f1115;border:1px solid var(--line);border-radius:8px;
+    padding:11px 12px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#cdd6e4;max-height:340px;overflow:auto}
+.kv{font-size:13px;margin:2px 0}.kv b{color:#cfe}
+table{border-collapse:collapse;width:100%;font-size:13px;margin-top:6px}
+td,th{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left}
+th{color:var(--mut);font-weight:600}
+.ex{font-size:13px;color:#c7ccd6;margin:5px 0;padding-left:14px;border-left:2px solid var(--line)}
+.note{font-size:12px;color:var(--mut);margin-top:22px;border-top:1px solid var(--line);padding-top:14px}
+code{background:#0f1115;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:20px;color:#0b0d10}
+.pill.h{background:var(--harm)}.pill.s{background:var(--sens)}
+</style></head><body><div class="wrap">
+<h1>Harmful vs Sensitive — Definitions <a href="index.html">&#8592; dashboards</a></h1>
+<p class="sub">Two different questions, two different classifiers, two different labels. This page shows
+the exact criteria — including the verbatim prompts sent to the LLM judge that validates each one.</p>
+
+<div class="tldr">
+<b>The distinction.</b> <span class="pill h">HARMFUL</span> = the document contains genuinely unsafe
+content (something that could cause harm). <span class="pill s">SENSITIVE</span> = the document merely
+<i>touches</i> a sensitive subject — even neutrally, historically, clinically, or in fiction.
+A Civil War history, a death-penalty ruling, or Magic-the-Gathering flavor text are <b>sensitive but
+not harmful</b>. Every harmful doc is sensitive; most sensitive docs are not harmful.
+</div>
+
+<div class="cols">
+  <div class="col harm"><h2>HARMFUL</h2><div class="body">
+    <h3>What counts</h3>
+    <p style="margin:0 0 4px">Genuinely unsafe content: explicit/violent/illegal/hateful/self-harm material —
+    something that could actually cause harm. Neutral or educational mention of a dark topic does <b>not</b> count.</p>
+    <h3>Classifier</h3>
+    <div class="kv"><b>SafeLM 0&ndash;5 head</b> (mmBERT + frozen-embedding head, &lambda;=100, recall-tuned).</div>
+    <div class="kv">Flag = predicted safety score &ge; 4 (or P(&ge;4) &ge; &tau;).</div>
+    <h3>Validated behaviour</h3>
+    <div class="kv">Recall on genuinely-harmful: <b>~100%</b> (0.2% missed in the unflagged region).</div>
+    <div class="kv">Precision (harm criterion): <b>low</b> — over-flags benign formal text (the precision problem).</div>
+    <h3>Exact judge prompt (system)</h3>
+    <pre>You are a strict web-content safety rater. Decide whether a document contains genuinely UNSAFE material.
+UNSAFE = sexually explicit/pornographic content; graphic violence or gore; hate speech or slurs targeting a protected group; harassment or threats; promotion or how-to facilitation of illegal or dangerous acts (weapons, drugs, hacking, fraud, terrorism); self-harm or suicide encouragement; any child sexual content; or abusive heavy profanity.
+SAFE = ordinary content (news, education, fiction, reference, business, code, hobbies) even if it mentions a sensitive topic in an informational, historical, clinical, or neutral way.
+Answer with exactly one word: UNSAFE or SAFE.</pre>
+    <h3>Verdict mapping</h3>
+    <div class="kv">reply <code>UNSAFE</code> &rarr; correct flag &nbsp;|&nbsp; <code>SAFE</code> &rarr; false flag</div>
+    <h3>Examples</h3>
+    <div class="ex">explicit sexual / CSAM advocacy; graphic gang-rape narrative</div>
+    <div class="ex">neo-Nazi "kill Jews" incitement; racial-slur dictionaries</div>
+    <div class="ex">a ping-of-death / hacking how-to with the command</div>
+  </div></div>
+
+  <div class="col sens"><h2>SENSITIVE</h2><div class="body">
+    <h3>What counts</h3>
+    <p style="margin:0 0 4px">Any document <i>about</i> a sensitive subject (violence, sex, hate, crime, drugs,
+    self-harm, extremism, graphic medical, strong profanity) &mdash; <b>even when the treatment is neutral,
+    factual, historical, clinical, journalistic, educational, fictional, or critical.</b></p>
+    <h3>Classifier</h3>
+    <div class="kv"><b>Dedicated sensitive-topic head</b> (separate binary model on the same mmBERT embeddings).</div>
+    <div class="kv">Flag = predicted P(sensitive) &ge; &tau;.</div>
+    <h3>Validated behaviour</h3>
+    <div class="kv">Test <b>AUPRC 0.856</b> &middot; at precision 0.80, <b>recall 0.74</b>
+      &middot; at precision 0.90, recall 0.52.</div>
+    <div class="kv">Trained on 10,783 band-stratified docs, 25% sensitive.</div>
+    <h3>Exact judge prompt (system)</h3>
+    <pre>You are auditing a classifier that flags documents touching SENSITIVE or mature subject matter (its goal is to detect sensitive TOPICS, not only actively-harmful content). Decide whether a document genuinely involves sensitive/mature subject matter.
+SENSITIVE = the document is about, depicts, references, or contains: violence, war, weapons, death or gore; sexual or erotic content or sexuality; hate, racism, slurs, or discrimination; crime, illegal acts, or drugs; self-harm, suicide, or abuse; extremism or terrorism; graphic medical/injury content; or strong profanity. This counts EVEN IF the treatment is neutral, factual, historical, clinical, journalistic, educational, fictional, satirical, or critical of the harm.
+BENIGN = ordinary anodyne content with no such subject matter: e.g. recipes, software/tech docs, business, sports, hobbies, general science/math, travel, product or help pages, light fiction with no sensitive themes.
+Answer with exactly one word: SENSITIVE or BENIGN.</pre>
+    <h3>Verdict mapping</h3>
+    <div class="kv">reply <code>SENSITIVE</code> &rarr; correct flag &nbsp;|&nbsp; <code>BENIGN</code> &rarr; false flag</div>
+    <h3>Examples (sensitive but NOT harmful)</h3>
+    <div class="ex">Civil War history; a WWII-set novel with SS officers</div>
+    <div class="ex">a death-penalty Supreme Court ruling; Sudan oil-conflict news</div>
+    <div class="ex">Magic-the-Gathering "black is the color of death" flavor text</div>
+  </div></div>
+</div>
+
+<h3 style="margin-top:26px;font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em">User message (both judges)</h3>
+<pre><the document text> (truncated to ~2000 chars)</pre>
+
+<p class="note">Both judges run <b>meta-llama/Llama-3.3-70B-Instruct</b> on the SwissAI gateway, temperature 0,
+one-word answer; the sensitive criterion was cross-checked by 12 Claude agents (~82% agreement). Source of truth:
+<code>src/judge_threshold.py</code> (<code>CRITERIA</code>). The two classifiers are independent — a document can be
+sensitive-only, harmful-and-sensitive, or neither.</p>
+</div></body></html>
