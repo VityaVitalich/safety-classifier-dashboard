@@ -73,9 +73,9 @@ Answer with exactly one word: UNSAFE or SAFE.</pre>
     <div class="kv"><b>Dedicated sensitive-topic head</b> (separate binary model on the same mmBERT embeddings).</div>
     <div class="kv">Flag = predicted P(sensitive) &ge; &tau;.</div>
     <h3>Validated behaviour</h3>
-    <div class="kv">Test <b>AUPRC 0.856</b> &middot; at precision 0.80, <b>recall 0.74</b>
+    <div class="kv">Test <b>AUPRC 0.861</b> &middot; at precision 0.80, <b>recall 0.74</b>
       &middot; at precision 0.90, recall 0.52.</div>
-    <div class="kv">Trained on 10,783 band-stratified docs, 25% sensitive.</div>
+    <div class="kv">Trained on 10,110 band-stratified docs, 24% sensitive.</div>
     <h3>Exact judge prompt (system)</h3>
     <pre>You are auditing a classifier that flags documents touching SENSITIVE or mature subject matter (its goal is to detect sensitive TOPICS, not only actively-harmful content). Decide whether a document genuinely involves sensitive/mature subject matter.
 SENSITIVE = the document is about, depicts, references, or contains: violence, war, weapons, death or gore; sexual or erotic content or sexuality; hate, racism, slurs, or discrimination; crime, illegal acts, or drugs; self-harm, suicide, or abuse; extremism or terrorism; graphic medical/injury content; or strong profanity. This counts EVEN IF the treatment is neutral, factual, historical, clinical, journalistic, educational, fictional, satirical, or critical of the harm.
